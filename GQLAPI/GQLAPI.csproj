@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GQLDomain\GQLDomain.csproj" />
+    <ProjectReference Include="..\GQLInfrastructure\GQLInfrastructure.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,6 @@
 using GQLDomain.Database;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace GQLAPI
 {
@@ -9,19 +10,33 @@ namespace GQLAPI
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            string? ConnectionString = builder.Configuration.GetConnectionString("Default");
-            
-            // Register services before building the app
-            //builder.Services.AddGraphQLServer().AddQueryType<Query>();
+            // Retrieve connection string
+            string? connectionString = builder.Configuration.GetConnectionString("Default");
 
-            builder.Services.AddPooledDbContextFactory<AppDbContext>(o => o.UseSqlServer(ConnectionString));
+            // Register services
+            builder.Services.AddPooledDbContextFactory<AppDbContext>(options =>
+                options.UseSqlServer(connectionString));
 
+            // Register GraphQL server and queries
+            builder.Services.AddGraphQLServer().AddQueryType<Query>();
 
+            // Build the app
             var app = builder.Build();
+
+            // Run migrations
+            using (var scope = app.Services.CreateScope())
+            {
+                var contextFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<AppDbContext>>();
+                using (var context = contextFactory.CreateDbContext())
+                {
+                    context.Database.Migrate();
+                }
+            }
 
             // Configure middleware and route mappings
             app.MapGraphQL();
 
+            // Run the app
             app.Run();
         }
     }
