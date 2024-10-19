@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\GQLApp\GQLApp.csproj" />
     <ProjectReference Include="..\GQLDomain\GQLDomain.csproj" />
   </ItemGroup>
 
